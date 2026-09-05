@@ -1,1 +1,4 @@
 *.pdb
+*.dll
+*.json
+*.exe
