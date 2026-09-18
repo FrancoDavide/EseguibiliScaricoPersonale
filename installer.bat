@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 > nul
 
-echo === ESTRATTORE SMART UNIVERSALE COMPLETO ===
+echo === ESTRATTORE COMPLETO ===
 echo.
 
 :: 1. Richiesta del file ZIP (puoi trascinarlo da ovunque)
@@ -10,12 +10,12 @@ set "zip_path=%zip_path:"=%"
 echo.
 
 :: 2. Richiesta della cartella di destinazione principale
-set /p "dest_path=2. Trascina qui la cartella di destinazione e premi Invio: "
+set /p "dest_path=2. Trascina qui la cartella di destinazione dove estrarre il contenuto e creare collegamento (es. Desktop)  e premi Invio: "
 set "dest_path=%dest_path:"=%"
 echo.
 
 :: 3. Richiesta del file Excel
-set /p "excel_path=3. Trascina qui il file Excel da inserire e premi Invio: "
+set /p "excel_path=3. Trascina qui il file Excel con i codici dei dipendenti da inserire e premi Invio: "
 set "excel_path=%excel_path:"=%"
 echo.
 
