@@ -10,7 +10,7 @@ set "zip_path=%zip_path:"=%"
 echo.
 
 :: 2. Richiesta della cartella di destinazione principale
-set /p "dest_path=2. Trascina qui la cartella di destinazione dove estrarre il contenuto e creare collegamento (es. Desktop)  e premi Invio: "
+set /p "dest_path=2. Trascina qui la cartella di destinazione dove estrarre il contenuto e creare collegamento(es. Desktop) e premi Invio: "
 set "dest_path=%dest_path:"=%"
 echo.
 
@@ -54,11 +54,11 @@ powershell -Command "$realDest = '%dest_path%'; if ((Split-Path $realDest -Leaf)
 powershell -Command "$realDest = '%dest_path%'; if ((Split-Path $realDest -Leaf) -ne 'publish') { $realDest = Join-Path $realDest 'publish' }; $jsonPath = Join-Path $realDest 'config\appsettings.json'; if (Test-Path $jsonPath) { $excelFileName = Split-Path '%excel_path%' -Leaf; $finalExcelPath = Join-Path $realDest \"FILE GESTIONALI\$excelFileName\"; $finalOutputDir = Join-Path $realDest 'FILE GESTIONALI'; $json = Get-Content $jsonPath -Raw | ConvertFrom-Json; $json.PercorsoFileFrontiera = $finalExcelPath; $json.PercorsoCartellaOutput = $finalOutputDir; $Utf8NoBom = New-Object System.Text.UTF8Encoding($false); [System.IO.File]::WriteAllText($jsonPath, ($json | ConvertTo-Json -Depth 10), $Utf8NoBom); Write-Host '[OK] File appsettings.json configurato correttamente!' } else { Write-Warning 'File appsettings.json non trovato in config\appsettings.json' }"
 
 echo.
-echo FASE 3: Creazione collegamento sul Desktop da Amministratore...
+echo FASE 3: Gestione collegamento sul Desktop da Amministratore...
 echo.
 
-:: 12. Creazione del collegamento .lnk sul Desktop con flag Amministratore nativo
-powershell -Command "$realDest = '%dest_path%'; if ((Split-Path $realDest -Leaf) -ne 'publish') { $realDest = Join-Path $realDest 'publish' }; $exeFile = Get-ChildItem -Path $realDest -Filter 'ScaricoPersonale.exe' | Select-Object -First 1; if ($exeFile) { $desktopPath = [System.IO.Path]::Combine([Environment]::GetFolderPath('Desktop'), 'ScaricoPersonale.lnk'); $ws = New-Object -ComObject WScript.Shell; $sc = $ws.CreateShortcut($desktopPath); $sc.TargetPath = $exeFile.FullName; $sc.WorkingDirectory = $realDest; $sc.Save(); $bytes = [System.IO.File]::ReadAllBytes($desktopPath); $bytes[21] = $bytes[21] -bor 32; [System.IO.File]::WriteAllBytes($desktopPath, $bytes); Write-Host '[OK] Collegamento da Amministratore creato sul tuo Desktop!' } else { Write-Warning 'File ScaricoPersonale.exe non trovato in publish.' }"
+:: 12. Rimozione vecchio collegamento e creazione del nuovo .lnk sul Desktop con flag Amministratore nativo
+powershell -Command "$realDest = '%dest_path%'; if ((Split-Path $realDest -Leaf) -ne 'publish') { $realDest = Join-Path $realDest 'publish' }; $exeFile = Get-ChildItem -Path $realDest -Filter 'ScaricoPersonale.exe' | Select-Object -First 1; if ($exeFile) { $desktopPath = [System.IO.Path]::Combine([Environment]::GetFolderPath('Desktop'), 'ScaricoPersonale.lnk'); if (Test-Path $desktopPath) { Remove-Item $desktopPath -Force; Write-Host '[OK] Vecchio collegamento rimosso dal Desktop.' }; $ws = New-Object -ComObject WScript.Shell; $sc = $ws.CreateShortcut($desktopPath); $sc.TargetPath = $exeFile.FullName; $sc.WorkingDirectory = $realDest; $sc.Save(); $bytes = [System.IO.File]::ReadAllBytes($desktopPath); $bytes[21] = $bytes[21] -bor 32; [System.IO.File]::WriteAllBytes($desktopPath, $bytes); Write-Host '[OK] Nuovo collegamento da Amministratore creato sul tuo Desktop!' } else { Write-Warning 'File ScaricoPersonale.exe non trovato in publish.' }"
 
 :: 13. Pulizia finale dei file temporanei
 powershell -Command "$tempDir = Join-Path $env:TEMP 'zip_extract_temp'; if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }"
